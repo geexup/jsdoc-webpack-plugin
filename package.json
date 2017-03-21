@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/geexup/jsdoc-webpack-plugin"
+    "url": "git+https://github.com/geexup/jsdoc-webpack-plugin-v2"
   },
   "keywords": [
     "jsdoc",
@@ -17,9 +17,9 @@
   "author": "Mitko Tschimev <net.mitko.tschimev@mhp.com> (http://www.mitko-tschimev.de)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/geexup/jsdoc-webpack-plugin/issues"
+    "url": "https://github.com/geexup/jsdoc-webpack-plugin-v2/issues"
   },
-  "homepage": "https://github.com/geexup/jsdoc-webpack-plugin#readme",
+  "homepage": "https://github.com/geexup/jsdoc-webpack-plugin-v2#readme",
   "dependencies": {
     "fs-extra": "0.30.0",
     "jsdoc": "3.4.0"
