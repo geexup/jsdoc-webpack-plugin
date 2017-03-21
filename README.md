@@ -4,7 +4,7 @@ jsdoc-webpack-plugin-v2
 
 WebPack plugin that runs [jsdoc](http://usejsdoc.org/) on your bundles
 
-#Install
+# Install
 ```
 npm i jsdoc-webpack-plugin-v2 --save
 ````
