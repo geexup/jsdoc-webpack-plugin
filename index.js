@@ -1,6 +1,5 @@
 var fs = require('fs');
 var path = require('path');
-var merge = require('lodash/merge');
 var spawn = require('child_process').spawn;
 var fsExtra = require('fs-extra');
 
@@ -9,7 +8,7 @@ function Plugin(translationOptions) {
     conf: './jsdoc.conf'
   };
 
-  this.options = merge({}, defaultOptions, translationOptions);
+  this.options = Object.assign({}, defaultOptions, translationOptions);
 }
 
 Plugin.prototype.apply = function (compiler) {
@@ -45,16 +44,18 @@ Plugin.prototype.apply = function (compiler) {
             }
           });
         });
-        merge(obj.source, { include: files });
+
+        Object.assign(obj.source, { include: files });
       }
 
       var jsDocConfTmp = path.resolve(cwd, 'jsdoc.' + Date.now() + '.conf.tmp');
       fs.writeFileSync(jsDocConfTmp, JSON.stringify(obj));
 
-        if(/^win/.test(process.platform))
-            jsdoc = spawn(__dirname + '/node_modules/.bin/jsdoc.cmd', ['-c', jsDocConfTmp]);
-        else
-            jsdoc = spawn(__dirname + '/node_modules/.bin/jsdoc', ['-c', jsDocConfTmp]);
+      if (/^win/.test(process.platform)) {
+          jsdoc = spawn(__dirname + '/../.bin/jsdoc.cmd', ['-c', jsDocConfTmp]);
+      } else {
+          jsdoc = spawn(__dirname + '/../.bin/jsdoc', ['-c', jsDocConfTmp]);
+      }
 
       jsdoc.stdout.on('data', function (data) {
         console.log(data.toString());
@@ -72,9 +73,8 @@ Plugin.prototype.apply = function (compiler) {
         } else {
           console.log('JsDoc successful');
         }
-        fs.unlink(jsDocConfTmp, function() {
-          callback();
-        });
+
+        fs.unlink(jsDocConfTmp, function() { callback(); });
       });
     });
   });

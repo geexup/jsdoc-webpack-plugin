@@ -1,6 +1,6 @@
 {
-  "name": "jsdoc-webpack-plugin",
-  "version": "0.0.2",
+  "name": "jsdoc-webpack-plugin-v2",
+  "version": "0.0.1",
   "description": "JsDoc Webpack Plugin",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tfiwm/jsdoc-webpack-plugin.git"
+    "url": "git+https://github.com/geexup/jsdoc-webpack-plugin"
   },
   "keywords": [
     "jsdoc",
@@ -17,12 +17,11 @@
   "author": "Mitko Tschimev <net.mitko.tschimev@mhp.com> (http://www.mitko-tschimev.de)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tfiwm/jsdoc-webpack-plugin/issues"
+    "url": "https://github.com/geexup/jsdoc-webpack-plugin/issues"
   },
-  "homepage": "https://github.com/tfiwm/jsdoc-webpack-plugin#readme",
+  "homepage": "https://github.com/geexup/jsdoc-webpack-plugin#readme",
   "dependencies": {
-    "fs-extra": "^0.30.0",
-    "jsdoc": "^3.4.0",
-    "lodash": "^4.11.2"
+    "fs-extra": "0.30.0",
+    "jsdoc": "3.4.0"
   }
 }
