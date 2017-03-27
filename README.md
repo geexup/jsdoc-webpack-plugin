@@ -19,14 +19,9 @@ module.exports = {
     /// ... rest of config
     plugins: [
         new JsDocPlugin({
-            conf: './jsdoc.conf'
+            conf: path.join(__dirname, 'jsdoc.json'),
         })
     ]
 }
 
 ```
-
-There are two ways how this plugin recognizes the files
-
-1. It takes the information from the jsdoc config file "source.include"
-2. If no "source.include" provided, it takes the whole files from your bundles

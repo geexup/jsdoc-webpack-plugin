@@ -1,87 +1,54 @@
 var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
-var fsExtra = require('fs-extra');
 
-function Plugin(translationOptions) {
-  var defaultOptions = {
-    conf: './jsdoc.conf'
-  };
-
-  this.options = Object.assign({}, defaultOptions, translationOptions);
+function Plugin(options) {
+  this.configPath = options.conf;
+  this.rootPath = path.parse(options.conf).dir;
+  this.jsdocRoot = path.join(__dirname, '..', '.bin');
+  this.tempConfigFile = path.join(this.rootPath, 'jsdoc-' + Date.now() + '.temp.json');
 }
+
 
 Plugin.prototype.apply = function (compiler) {
   var self = this;
-  var options = self.options;
-
-  compiler.plugin('watch-run', function (watching, callback) {
-    self.webpackIsWatching = true;
-    callback(null, null);
-  });
 
   compiler.plugin('emit', function (compilation, callback) {
-    console.log('JSDOC Start generating');
+    console.log('\x1b[33m%s\x1b[0m', '[JSDOC] Start generating');
 
-    fsExtra.readJson(path.resolve(process.cwd(), options.conf), function (err, obj) {
-      var files = [], jsdocErrors = [];
-      var jsdoc, cwd = process.cwd();
+    var configJson = JSON.parse(fs.readFileSync(self.configPath, 'utf-8'));
+    configJson.source.include = path.join(self.rootPath, configJson.source.include);
 
-      if(err) {
-        callback(err);
-        return;
-      }
+    if (configJson.hasOwnProperty('opts')) {
+      if(configJson.opts.hasOwnProperty('template'))
+        configJson.opts.template = path.join(self.rootPath, configJson.opts.template);
 
-      if (obj.source && obj.source.include) {
-        console.log('Taking sources from config file');
-      } else {
-        compilation.chunks.forEach(function (chunk) {
-          chunk.modules.forEach(function (module) {
-            if (module.fileDependencies) {
-              module.fileDependencies.forEach(function (filepath) {
-                files.push(path.relative(process.cwd(), filepath));
-              });
-            }
-          });
-        });
+      if(configJson.opts.hasOwnProperty('tutorials'))
+        configJson.opts.tutorials = path.join(self.rootPath, configJson.opts.tutorials);
 
-        Object.assign(obj.source, { include: files });
-      }
+      if(configJson.opts.hasOwnProperty('destination'))
+        configJson.opts.destination = path.join(self.rootPath, configJson.opts.destination);
+    }
 
-      var jsDocConfTmp = path.resolve(cwd, 'jsdoc.' + Date.now() + '.conf.tmp');
-      fs.writeFileSync(jsDocConfTmp, JSON.stringify(obj));
+    fs.writeFileSync(self.tempConfigFile, JSON.stringify(configJson), 'utf-8');
 
-      if (/^win/.test(process.platform)) {
-          jsdoc = spawn(__dirname + '/../.bin/jsdoc.cmd', ['-c', jsDocConfTmp]);
-      } else {
-          jsdoc = spawn(__dirname + '/../.bin/jsdoc', ['-c', jsDocConfTmp]);
-      }
+    if(/^win/.test(process.platform))
+        jsdoc = spawn( 'jsdoc.cmd', ['-c', self.tempConfigFile], { cwd: self.jsdocRoot });
+    else
+        jsdoc = spawn( path.join(self.jsdocRoot, 'jsdoc'), ['-c', self.tempConfigFile] );
 
-      jsdoc.stdout.on('data', function (data) {
-        console.log(data.toString());
-      });
-
-      jsdoc.stderr.on('data', function (data) {
-        jsdocErrors.push(data.toString());
-      });
-
-      jsdoc.on('close', function (data, code) {
-        if(jsdocErrors.length > 0) {
-          jsdocErrors.forEach(function (value) {
-            console.error(value);
-          });
-        } else {
-          console.log('JsDoc successful');
-        }
-
-        fs.unlink(jsDocConfTmp, function() { callback(); });
-      });
+    jsdoc.stdout.on('data', function (data) { console.log('\x1b[33m%s\x1b[0m', '[JSDOC] ' + data.toString()); });
+    jsdoc.stderr.on('data', function (data) { console.error('\x1b[31m%s\x1b[0m', '[JSDOC] ' + data.toString()); });
+    jsdoc.on('close', function () {
+        fs.unlinkSync(self.tempConfigFile);
+        console.log('\x1b[33m%s\x1b[0m', 'JsDoc Generated');
+        callback();
     });
   });
 
   compiler.plugin('done', function (stats) {
-    console.log('JSDOC Finished generating');
-    console.log('JSDOC TOTAL TIME:', stats.endTime - stats.startTime);
+    console.log('\x1b[33m%s\x1b[0m','[JSDOC] Finished generating');
+    console.log('\x1b[33m%s\x1b[0m','[JSDOC] TOTAL TIME:', stats.endTime - stats.startTime);
   });
 };
 
