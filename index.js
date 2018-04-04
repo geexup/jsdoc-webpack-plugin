@@ -4,6 +4,7 @@ var spawn = require('child_process').spawn;
 
 function Plugin(options) {
   this.configPath = options.conf;
+  this.recurse = options.recurse || false;
   this.rootPath = path.parse(options.conf).dir;
   this.jsdocRoot = path.join(__dirname, '..', '.bin');
   this.tempConfigFile = path.join(this.rootPath, 'jsdoc-' + Date.now() + '.temp.json');
@@ -32,10 +33,16 @@ Plugin.prototype.apply = function (compiler) {
 
     fs.writeFileSync(self.tempConfigFile, JSON.stringify(configJson), 'utf-8');
 
+    var argArray = ['-c', self.tempConfigFile];
+
+    if (self.recurse) {
+      argArray.push("-r");
+    }
+
     if(/^win/.test(process.platform))
-        jsdoc = spawn( 'jsdoc.cmd', ['-c', self.tempConfigFile], { cwd: self.jsdocRoot });
+        jsdoc = spawn( 'jsdoc.cmd', argArray, { cwd: self.jsdocRoot });
     else
-        jsdoc = spawn( path.join(self.jsdocRoot, 'jsdoc'), ['-c', self.tempConfigFile] );
+        jsdoc = spawn( path.join(self.jsdocRoot, 'jsdoc'), argArray );
 
     jsdoc.stdout.on('data', function (data) { console.log('\x1b[33m%s\x1b[0m', '[JSDOC] ' + data.toString()); });
     jsdoc.stderr.on('data', function (data) { console.error('\x1b[31m%s\x1b[0m', '[JSDOC] ' + data.toString()); });
