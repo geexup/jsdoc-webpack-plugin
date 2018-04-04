@@ -20,6 +20,7 @@ module.exports = {
     plugins: [
         new JsDocPlugin({
             conf: path.join(__dirname, 'jsdoc.json'),
+            recurse: true, // Optionally recurse source directory (adds -r flag to jsdoc command)
         })
     ]
 }
