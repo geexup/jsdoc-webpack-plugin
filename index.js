@@ -4,7 +4,7 @@ var spawn = require('child_process').spawn;
 
 function Plugin(options) {
   this.configPath = options.conf;
-  this.recurse = options.recurse || false;
+  this.extraFlags = options.extraFlags || [];
   this.rootPath = path.parse(options.conf).dir;
   this.jsdocRoot = path.join(__dirname, '..', '.bin');
   this.tempConfigFile = path.join(this.rootPath, 'jsdoc-' + Date.now() + '.temp.json');
@@ -35,9 +35,7 @@ Plugin.prototype.apply = function (compiler) {
 
     var argArray = ['-c', self.tempConfigFile];
 
-    if (self.recurse) {
-      argArray.push("-r");
-    }
+    argArray = argArray.concat(self.extraFlags);
 
     if(/^win/.test(process.platform))
         jsdoc = spawn( 'jsdoc.cmd', argArray, { cwd: self.jsdocRoot });
